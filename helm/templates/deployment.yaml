@@ -4,6 +4,10 @@ metadata:
   name: {{ include "idxworker.fullname" . }}
   labels:
     {{- include "idxworker.labels" . | nindent 4 }}
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 8 }}
+  {{- end }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
