@@ -4,9 +4,9 @@ metadata:
   name: {{ include "idxworker.fullname" . }}
   labels:
     {{- include "idxworker.labels" . | nindent 4 }}
-  {{- with .Values.annotations }}
+  {{- if .Values.annotations }}
   annotations:
-  {{- toYaml . | nindent 8 }}
+  {{- tpl (toYaml .Values.annotations) .  | nindent 8 }}
   {{- end }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
@@ -73,10 +73,10 @@ spec:
       initContainers:
         - name: init-solr
           image: busybox:latest
-          command: ['sh', '-c', "until nc -z {{ .Values.solr.hostname}} {{ .Values.solr.service.ports.http }} > /dev/null; do echo waiting for Solr; sleep 5; done"]
+          command: ['sh', '-c', "until nc -z {{ tpl .Values.solr.hostname . }} {{ .Values.solr.service.ports.http }} > /dev/null; do echo waiting for Solr; sleep 5; done"]
         - name: init-rabbitmq
           image: busybox:latest
-          command: ['sh', '-c', "until nc -z {{ .Values.rabbitmq.hostname }} {{ .Values.rabbitmq.hostport}} > /dev/null; do echo waiting for RabbitMQ; sleep 2; done"]
+          command: ['sh', '-c', "until nc -z {{ tpl .Values.rabbitmq.hostname . }} {{ .Values.rabbitmq.hostport}} > /dev/null; do echo waiting for RabbitMQ; sleep 2; done"]
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
